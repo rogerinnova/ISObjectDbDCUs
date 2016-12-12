@@ -12,7 +12,7 @@ uses
   FMX.Layouts, FMX.ListBox;
 
 type
-  TForm1 = class(TForm)
+  TDbGetForm = class(TForm)
     ImageList1: TImageList;
     ListBox1: TListBox;
     Panel1: TPanel;
@@ -32,6 +32,9 @@ type
   private
     { Private declarations }
     FObjectDb: TInnovaSampleDb;
+{$IfDef NextGen}
+    Procedure EditCompleted(ARef:TObject);
+{$ENDIF}
     function EditObject(AObject: TObject): Boolean;
     Function AddNewObject: TObject;
     Function ObjectFromListBox: TObject;
@@ -57,7 +60,7 @@ Const
     'Jones', 'Nerk');
 
 var
-  Form1: TForm1;
+  DbGetForm: TDbGetForm;
 
 
 implementation
@@ -69,6 +72,14 @@ uses DlgObjectEdit
     ;
 
 {$R *.fmx}
+{$R *.iPhone4in.fmx IOS}
+{$R *.iPhone47in.fmx IOS}
+{$R *.iPhone.fmx IOS}
+{$R *.iPhone55in.fmx IOS}
+{$R *.SmXhdpiPh.fmx ANDROID}
+{$R *.NmXhdpiPh.fmx ANDROID}
+{$R *.LgXhdpiPh.fmx ANDROID}
+
 { $ R *.LgXhdpiPh.fmx ANDROID }
 { $ R *.NmXhdpiPh.fmx ANDROID }
 { $ R *.iPhone55in.fmx IOS }
@@ -83,7 +94,7 @@ Const
   LocalDbFileNameConst = 'SmplTestDb.IDB';
   LocalDbPathBitConst = 'ISObjDbs';
 
-function TForm1.AddNewObject: TObject;
+function TDbGetForm.AddNewObject: TObject;
 Var
   NewObj: TSampleDbObject;
   Dlg: TDlgEditUsrObject;
@@ -93,6 +104,12 @@ begin
   Dlg := TDlgEditUsrObject.Create(Self);
   try
     Dlg.EditObject := NewObj;
+{$IFDEF NEXTGEN}      //No Model Form
+    Dlg.DbFile:=FObjectDb;
+    Dlg.Execute(EditCompleted);
+  finally
+    Dlg:=nil;
+{$ELSE}
     if Dlg.Execute then
     begin
       FObjectDb.WriteIndexedObject(NewObj);
@@ -102,12 +119,20 @@ begin
       NewObj.Free;
   finally
     Dlg.Free;
+{$ENDIF}
   end;
   if Result <> nil then
     RefreshFormData;
 end;
 
-function TForm1.EditObject(AObject: TObject): Boolean;
+{$IfDef NextGen}
+Procedure TDbGetForm.EditCompleted(ARef:TObject);
+  Begin
+    RefreshFormData;
+  End;
+{$ENDIF}
+
+function TDbGetForm.EditObject(AObject: TObject): Boolean;
 Var
   Dlg: TDlgEditUsrObject;
   DbIndex: Integer;
@@ -121,16 +146,23 @@ begin
     Dlg := TDlgEditUsrObject.Create(Self);
     try
       Dlg.EditObject := AObject as TSampleDbObject;
-      Result := Dlg.Execute;
+{$IFDEF NEXTGEN}
+      Dlg.Execute(EditCompleted);
+      Result:=True;
+    finally
+      Dlg:=nil;
+{$ELSE}
+    Result := Dlg.Execute;
     finally
       Dlg.Free;
+{$ENDIF}
     end;
   End;
   if Result then
     RefreshFormData;
 end;
 
-procedure TForm1.FreeDb;
+procedure TDbGetForm.FreeDb;
 begin
 {$IFDEF NextGen}
   DisposeOfAndNil(TObject(FObjectDb));
@@ -141,7 +173,7 @@ begin
   RefreshFormData;
 end;
 
-function TForm1.GetDb: TInnovaSampleDb;
+function TDbGetForm.GetDb: TInnovaSampleDb;
 begin
   if FObjectDb = nil then
     Result := GetLocalDb
@@ -149,12 +181,12 @@ begin
     Result := FObjectDb;
 end;
 
-function TForm1.GetLastError: String;
+function TDbGetForm.GetLastError: String;
 begin
   Result := Caption;
 end;
 
-function TForm1.GetLocalDb: TInnovaSampleDb;
+function TDbGetForm.GetLocalDb: TInnovaSampleDb;
 begin
   if FObjectDb <> nil then
     if FObjectDb.RemoteFile then
@@ -177,7 +209,7 @@ begin
   RefreshFormData;
 end;
 
-function TForm1.GetRemoteDb: TInnovaSampleDb;
+function TDbGetForm.GetRemoteDb: TInnovaSampleDb;
 begin
   if FObjectDb <> nil then
     if not FObjectDb.RemoteFile then
@@ -191,7 +223,7 @@ begin
   RefreshFormData;
 end;
 
-function TForm1.LocalDbFileName: String;
+function TDbGetForm.LocalDbFileName: String;
 Var
   DbDir: String;
 begin
@@ -206,7 +238,7 @@ begin
   Result := Tpath.Combine(DbDir, LocalDbFileNameConst);
 end;
 
-function TForm1.ObjectFromListBox: TObject;
+function TDbGetForm.ObjectFromListBox: TObject;
 Var
   Idx: Integer;
 begin
@@ -219,7 +251,7 @@ begin
     Result := FObjectDb.ReadFileObjectByIndex(ListBox1.Items.Objects[Idx]);
 end;
 
-procedure TForm1.RefreshFormData;
+procedure TDbGetForm.RefreshFormData;
 begin
   ListBox1.Items.Clear;
   if FObjectDb <> nil then
@@ -230,7 +262,7 @@ begin
     LblConfigText.Text := 'No Db';
 end;
 
-procedure TForm1.RemoveAndResetLocalDb;
+procedure TDbGetForm.RemoveAndResetLocalDb;
 Var
   NewDb: TInnovaSampleDb;
   NxtObj: TSampleDbObject;
@@ -269,7 +301,7 @@ begin
   RefreshFormData;
 end;
 
-procedure TForm1.SBtnAddClick(Sender: TObject);
+procedure TDbGetForm.SBtnAddClick(Sender: TObject);
 Var
   NewObject: TObject;
 begin
@@ -277,33 +309,33 @@ begin
   RefreshFormData;
 end;
 
-procedure TForm1.SBtnEditClick(Sender: TObject);
+procedure TDbGetForm.SBtnEditClick(Sender: TObject);
 begin
   EditObject(ObjectFromListBox);
   RefreshFormData;
 end;
 
-procedure TForm1.sBtnExitClick(Sender: TObject);
+procedure TDbGetForm.sBtnExitClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TForm1.SbtnLocalDbClick(Sender: TObject);
+procedure TDbGetForm.SbtnLocalDbClick(Sender: TObject);
 begin
   GetLocalDb;
 end;
 
-procedure TForm1.SbtnNewDbClick(Sender: TObject);
+procedure TDbGetForm.SbtnNewDbClick(Sender: TObject);
 begin
   RemoveAndResetLocalDb;
 end;
 
-procedure TForm1.SBtnRemoteDbClick(Sender: TObject);
+procedure TDbGetForm.SBtnRemoteDbClick(Sender: TObject);
 begin
   GetRemoteDb;
 end;
 
-procedure TForm1.SetLastError(const Value: String);
+procedure TDbGetForm.SetLastError(const Value: String);
 begin
   Caption := Value;
 end;

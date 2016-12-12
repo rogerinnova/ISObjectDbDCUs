@@ -187,11 +187,7 @@ begin
   FFamilyName := ReadStrmUnicodeString(s);
   FPhone := ReadStrmUnicodeString(s);
   // Example of encapsulated Object;
-{$IFDEF Nextgen}
-  FSampleData := ReadStrmObject(s, self) as TSampleData;
-{$ELSE}
   FSampleData := ReadStrmObject(s, self);
-{$ENDIF}
   // Example of encapsulated List;
   ReadStrmList(s, ListOfChildren); // List Of TSampleDbObject
 end;

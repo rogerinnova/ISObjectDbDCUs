@@ -3,7 +3,7 @@ program InnovaDbSample;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  FrmInnovaDbExample in 'FrmInnovaDbExample.pas' {Form1},
+  FrmInnovaDbExample in 'FrmInnovaDbExample.pas' {DbGetForm},
   SampleObjects in 'SampleObjects.pas',
   DatabaseVersionConstants in 'DatabaseVersionConstants.pas',
   DlgObjectEdit in 'DlgObjectEdit.pas' {DlgEditUsrObject};
@@ -12,6 +12,6 @@ uses
 
 begin
   Application.Initialize;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TDbGetForm, DbGetForm);
   Application.Run;
 end.
