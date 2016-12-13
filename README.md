@@ -12,3 +12,8 @@ http://www.innovasolutions.com.au/delphistuf/ObjectDbInfo/Object%20Database.html
 
 This Repository provides DCUs for various Delphi Versions a installer version of all dcus remains available from
 http://docs.innovasolutions.com.au/docs/ObjectDbDCU/Object%20Framework%20DCU%20Setup.exe
+
+More Options are available from
+http://delphinotes.innovasolutions.com.au/posts/innova-solutions-object-database-delphi-dcus/
+and
+http://delphinotes.innovasolutions.com.au/posts/innova-solutions-object-db-now-supports-mobile/  
