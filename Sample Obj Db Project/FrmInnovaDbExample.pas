@@ -118,7 +118,7 @@ begin
     else
       NewObj.Free;
   finally
-    Dlg.Free;
+    Dlg:=nil;// Dlg.Free;
 {$ENDIF}
   end;
   if Result <> nil then
@@ -154,7 +154,7 @@ begin
 {$ELSE}
     Result := Dlg.Execute;
     finally
-      Dlg.Free;
+    Dlg:=nil;// Dlg.Free;
 {$ENDIF}
     end;
   End;
