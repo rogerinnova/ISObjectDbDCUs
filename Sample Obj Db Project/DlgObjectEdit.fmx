@@ -9,7 +9,7 @@ object DlgEditUsrObject: TDlgEditUsrObject
   FormFactor.Devices = [Desktop]
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
-  DesignerMasterStyle = 3
+  DesignerMasterStyle = 0
   object PnlToolBar: TPanel
     Align = Top
     Size.Width = 467.000000000000000000
